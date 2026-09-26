@@ -1,0 +1,39 @@
+# ---- secrets / env ----
+.env
+.env.*
+!.env.example
+
+# ---- Node / frontend ----
+node_modules/
+frontend/dist/
+*.local
+npm-debug.log*
+
+# ---- Python / Django ----
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+db.sqlite3
+media/
+staticfiles/
+celerybeat-schedule
+*.pid
+
+# ---- logs ----
+*.log
+logs/
+
+# ---- editor / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ---- local tooling ----
+.opencode/

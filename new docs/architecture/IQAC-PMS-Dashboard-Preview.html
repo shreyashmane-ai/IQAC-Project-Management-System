@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IQAC PMS — Dashboard Preview</title>
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#f4f6fa; --card:#ffffff; --border:#e8edf3; --border2:#eef2f7;
+    --ink:#0f172a; --muted:#64748b; --muted2:#94a3b8;
+    --brand:#10b981; --brand-d:#059669; --brand-soft:#e7f8f1;
+    --blue:#3b82f6; --blue-d:#2563eb; --blue-soft:#e8f0fe;
+    --purple:#8b5cf6; --purple-soft:#f0ebfe;
+    --amber:#f59e0b; --amber-soft:#fef3e2;
+    --pink:#ec4899; --teal:#14b8a6; --teal-soft:#e4faf6;
+    --rose:#f43f5e; --rose-soft:#feeaed;
+    --navy:#0f172a;
+    --shadow:0 1px 2px rgba(15,23,42,.04), 0 1px 3px rgba(15,23,42,.06);
+    --shadow-lg:0 10px 30px -12px rgba(15,23,42,.18);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased;
+    font-size:14px; line-height:1.45;
+  }
+  .app{display:flex; min-height:100vh}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:264px; flex:0 0 264px; background:var(--card); border-right:1px solid var(--border);
+    padding:18px 14px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh; overflow:auto;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 14px}
+  .brand .logo{width:34px;height:34px;border-radius:10px;background:conic-gradient(from 140deg,#10b981,#14b8a6,#3b82f6,#8b5cf6,#10b981);display:flex;align-items:center;justify-content:center}
+  .brand .logo span{width:14px;height:14px;border-radius:50%;background:#fff;opacity:.9}
+  .brand b{font-size:16px;letter-spacing:-.2px}
+  .brand .collapse{margin-left:auto;width:26px;height:26px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted2)}
+
+  .org{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:9px 10px;margin-bottom:8px}
+  .org .sq{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#10b981,#3b82f6)}
+  .org .t{font-weight:600;font-size:13px}
+  .org .s{font-size:11px;color:var(--muted2)}
+  .org .chev{margin-left:auto;color:var(--muted2)}
+
+  .navlabel{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);padding:14px 10px 6px}
+  .nav a{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:11px;color:#475569;text-decoration:none;font-weight:500;font-size:13.5px}
+  .nav a svg{width:18px;height:18px;flex:0 0 18px;stroke:#64748b}
+  .nav a:hover{background:#f6f8fb;color:var(--ink)}
+  .nav a .badge{margin-left:auto;background:#eef2f7;color:#64748b;border-radius:999px;font-size:11px;font-weight:600;padding:1px 8px}
+  .nav a.active{background:var(--navy);color:#fff}
+  .nav a.active svg{stroke:var(--brand)}
+  .nav a.active .chev{margin-left:auto;color:#94a3b8}
+
+  /* ---------- Main ---------- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.9);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;padding:12px 26px}
+  .search{flex:1;max-width:520px;display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:9px 12px;color:var(--muted2);background:#fff}
+  .search input{border:0;outline:0;flex:1;font-size:13.5px;color:var(--ink);background:transparent}
+  .search .kbd{border:1px solid var(--border);border-radius:6px;padding:1px 6px;font-size:11px;color:var(--muted2)}
+  .tb-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .icobtn{width:38px;height:38px;border-radius:11px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;color:#475569;position:relative;cursor:pointer}
+  .icobtn.dark{background:var(--navy);border-color:var(--navy);color:#fff}
+  .icobtn .dot{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--rose);border:2px solid #fff}
+  .user{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:5px 10px 5px 5px;cursor:pointer}
+  .user .av{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#0ea5a4,#3b82f6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .user .n{font-weight:600;font-size:13px;line-height:1.1}
+  .user .r{font-size:11px;color:var(--muted2)}
+
+  .content{padding:24px 26px 40px}
+  .pagehead{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+  .pagehead h1{font-size:24px;letter-spacing:-.4px}
+  .pagehead p{color:var(--muted);margin-top:4px;font-size:13.5px}
+  .ph-actions{margin-left:auto;display:flex;gap:10px}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:11px;padding:10px 15px;font-weight:600;font-size:13.5px;border:1px solid var(--border);background:#fff;color:var(--ink);cursor:pointer;text-decoration:none}
+  .btn svg{width:16px;height:16px}
+  .btn.primary{background:var(--blue-d);border-color:var(--blue-d);color:#fff;box-shadow:0 6px 16px -6px rgba(37,99,235,.5)}
+  .btn.ghost{color:var(--muted)}
+
+  /* ---------- Grid ---------- */
+  .grid{display:grid;grid-template-columns:1.22fr 1fr 1.08fr;gap:18px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+  .card h3{font-size:15px;letter-spacing:-.2px}
+  .card .sub{color:var(--muted2);font-size:12px;margin-top:2px}
+  .cardhead{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+  .pill{margin-left:auto;font-size:11px;font-weight:600;color:var(--brand-d);background:var(--brand-soft);border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:6px}
+  .pill .live{width:6px;height:6px;border-radius:50%;background:var(--brand)}
+  .linklike{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+
+  .a-overview{grid-column:1;grid-row:1}
+  .a-dist{grid-column:2;grid-row:1}
+  .a-att{grid-column:3;grid-row:1 / span 2}
+  .a-dark{grid-column:1;grid-row:2}
+  .a-food{grid-column:2;grid-row:2}
+  .a-funnel{grid-column:1 / span 3;grid-row:3}
+
+  /* Overview big number + substats */
+  .bignum{display:flex;align-items:center;gap:10px}
+  .bignum .v{font-size:34px;font-weight:750;letter-spacing:-1px}
+  .bignum .chip{display:inline-flex;align-items:center;gap:4px;color:var(--brand-d);background:var(--brand-soft);font-weight:700;font-size:12px;border-radius:999px;padding:3px 9px}
+  .iconchip{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+  .iconchip svg{width:20px;height:20px;stroke:#fff}
+  .substats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .stat{border:1px solid var(--border);border-radius:13px;padding:13px}
+  .stat .top{display:flex;align-items:center;justify-content:space-between}
+  .trend{font-size:12px;font-weight:700;color:var(--brand-d);display:inline-flex;align-items:center;gap:3px}
+  .trend.down{color:var(--rose)}
+  .stat .lbl{color:var(--muted);font-size:12.5px;margin-top:11px}
+  .stat .val{font-size:22px;font-weight:750;letter-spacing:-.5px;margin-top:2px}
+
+  /* Donut */
+  .donutwrap{display:flex;align-items:center;gap:18px}
+  .donut{position:relative;width:150px;height:150px;flex:0 0 150px}
+  .donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .donut .center .v{font-size:24px;font-weight:750;letter-spacing:-.5px}
+  .donut .center .l{font-size:11px;color:var(--muted2)}
+  .legend{flex:1;display:flex;flex-direction:column;gap:9px}
+  .legend .row{display:flex;align-items:center;gap:9px;font-size:13px}
+  .legend .row .dot{width:9px;height:9px;border-radius:3px}
+  .legend .row .nm{color:#475569}
+  .legend .row .ct{margin-left:auto;font-weight:700}
+  .minirow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;border-top:1px solid var(--border2);padding-top:14px}
+  .mini{text-align:center;border:1px solid var(--border);border-radius:12px;padding:10px 6px}
+  .mini .v{font-size:19px;font-weight:750}
+  .mini .l{font-size:11px;color:var(--muted2);margin-top:2px}
+
+  /* Attendance summary */
+  .attgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .bars{margin-top:6px}
+  .bars .cap{display:flex;justify-content:space-between;align-items:center;margin:8px 0 12px}
+  .chart{display:flex;align-items:flex-end;gap:12px;height:150px;padding-top:6px}
+  .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%}
+  .bar .col{width:100%;max-width:26px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#34d399,#10b981);align-self:flex-end}
+  .bar.amber .col{background:linear-gradient(180deg,#fbbf24,#f59e0b)}
+  .bar .d{font-size:11px;color:var(--muted2)}
+
+  /* Dark card */
+  .dark{background:radial-gradient(120% 140% at 100% 0%, #134e4a 0%, #0f172a 55%);color:#fff;border:0;position:relative;overflow:hidden}
+  .dark .wave{position:absolute;left:0;right:0;bottom:0;opacity:.5}
+  .dark .lbl{color:#9fb3c8;font-size:12.5px}
+  .dark .big{font-size:30px;font-weight:750;letter-spacing:-.6px;margin-top:8px}
+  .dark .meta{color:#9fb3c8;font-size:12.5px;margin-top:4px}
+  .dark .btn{margin-top:16px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:#fff;backdrop-filter:blur(4px)}
+  .dark .btn:hover{background:rgba(255,255,255,.18)}
+
+  /* Green food card */
+  .food{background:linear-gradient(135deg,#10b981,#0ea5a4);color:#fff;border:0;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+  .food .ic{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .food .ic svg{width:20px;height:20px;stroke:#fff}
+  .food h3{color:#fff;font-size:17px}
+  .food p{color:rgba(255,255,255,.85);font-size:12.5px;margin-top:3px}
+  .food .btn{margin-top:15px;background:#fff;color:var(--brand-d);border:0;font-weight:700;align-self:flex-start}
+
+  /* Funnel */
+  .funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch}
+  .step{padding:6px 16px;position:relative}
+  .step + .step{border-left:1px dashed var(--border)}
+  .step .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .step .ic svg{width:17px;height:17px;stroke:#fff}
+  .step .l{font-size:12.5px;color:var(--muted)}
+  .step .v{font-size:23px;font-weight:750;letter-spacing:-.5px;margin-top:1px}
+  .step .track{height:5px;border-radius:999px;background:#eef2f7;margin-top:12px;overflow:hidden}
+  .step .track i{display:block;height:100%;border-radius:999px}
+  .step .pct{font-size:11px;color:var(--muted2);margin-top:7px}
+
+  .bg-brand{background:var(--brand)} .bg-blue{background:var(--blue)} .bg-purple{background:var(--purple)}
+  .bg-amber{background:var(--amber)} .bg-teal{background:var(--teal)} .bg-pink{background:var(--pink)} .bg-rose{background:var(--rose)}
+
+  .foot{color:var(--muted2);font-size:12px;text-align:center;margin-top:26px}
+  @media (max-width:1150px){ .grid{grid-template-columns:1fr 1fr} .a-att{grid-column:1 / span 2;grid-row:auto} .a-overview,.a-dist,.a-dark,.a-food,.a-funnel{grid-column:auto;grid-row:auto} .a-funnel{grid-column:1 / span 2} }
+  @media (max-width:820px){ .sidebar{display:none} .grid{grid-template-columns:1fr} .a-funnel,.a-att{grid-column:auto} .funnel{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo"><span></span></div>
+      <b>IQAC&nbsp;PMS</b>
+      <div class="collapse">
+        <svg viewBox="0 0 24 24" fill="none" width="16" height="16" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>
+      </div>
+    </div>
+
+    <div class="org">
+      <div class="sq"></div>
+      <div>
+        <div class="t">Sunrise Institute</div>
+        <div class="s">of Technology</div>
+      </div>
+      <div class="chev"><svg viewBox="0 0 24 24" fill="none" width="16" height="16" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+    </div>
+
+    <div class="navlabel">Main</div>
+    <nav class="nav">
+      <a class="active" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+        <span class="chev"><svg viewBox="0 0 24 24" fill="none" width="16" height="16" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+      </a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Academic Sessions</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v6h6"/></svg>Programs<span class="badge">14</span></a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M17 11a3 3 0 1 0-1-5.8M21.5 20a5.5 5.5 0 0 0-4-5.3"/></svg>Participants</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Attendance</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2s2-.9 2-2V2M5 11v11M18 2c-2 0-3 2-3 5s1 4 3 4 3-1 3-4-1-5-3-5zM18 15v7"/></svg>Food Distribution</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Feedback</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg>Certificates</a>
+    </nav>
+
+    <div class="navlabel">Manage</div>
+    <nav class="nav">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="7"/><rect x="12" y="7" width="3" height="11"/><rect x="17" y="13" width="3" height="5"/></svg>Reports</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 3h8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Documents</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>Master Data</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v5c0 5-3.4 8.5-8 11-4.6-2.5-8-6-8-11V6z"/></svg>Users &amp; Roles</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>Audit Log</a>
+    </nav>
+
+    <div style="margin-top:auto"></div>
+    <nav class="nav">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 6.6 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 4 12.6a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 5 5.6l-.1-.1A2 2 0 1 1 7.7 2.7l.1.1A1.6 1.6 0 0 0 10.4 4h.1A2 2 0 1 1 14.4 4v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H24"/></svg>Settings</a>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <div class="main">
+    <!-- topbar -->
+    <div class="topbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" width="18" height="18" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input placeholder="Search programs, participants, certificates…" />
+        <span class="kbd">⌘K</span>
+      </div>
+      <div class="tb-actions">
+        <div class="icobtn dark"><svg viewBox="0 0 24 24" fill="none" width="18" height="18" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8M4.6 9A1.6 1.6 0 0 0 4 12.6"/></svg></div>
+        <div class="icobtn"><svg viewBox="0 0 24 24" fill="none" width="18" height="18" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></div>
+        <div class="icobtn"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" width="18" height="18" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M4 8l8 5 8-5"/></svg></div>
+        <div class="icobtn"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" width="18" height="18" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+        <div class="user">
+          <div class="av">SM</div>
+          <div>
+            <div class="n">Shreyash</div>
+            <div class="r">IQAC Coordinator</div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16" stroke="#94a3b8" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- content -->
+    <div class="content">
+      <div class="pagehead">
+        <div>
+          <h1>Good morning, Shreyash 👋</h1>
+          <p>You have <b>3 programs running today</b> and <b>128 participants newly eligible</b> for food QR.</p>
+        </div>
+        <div class="ph-actions">
+          <a class="btn" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Export</a>
+          <a class="btn primary" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>New Program</a>
+        </div>
+      </div>
+
+      <div class="grid">
+
+        <!-- A: Participant overview -->
+        <section class="card a-overview">
+          <div class="cardhead">
+            <div>
+              <h3>Participant Overview</h3>
+              <div class="sub">Enrolled across 14 active programs</div>
+            </div>
+            <div class="iconchip bg-blue"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M17 11a3 3 0 1 0-1-5.8M21.5 20a5.5 5.5 0 0 0-4-5.3"/></svg></div>
+          </div>
+          <div class="bignum">
+            <div class="v">3,482</div>
+            <span class="chip">↑ 128 this session</span>
+          </div>
+          <div class="substats">
+            <div class="stat">
+              <div class="top">
+                <div class="iconchip bg-teal"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+                <span class="trend">↑ 2</span>
+              </div>
+              <div class="lbl">Running Today</div>
+              <div class="val">3</div>
+            </div>
+            <div class="stat">
+              <div class="top">
+                <div class="iconchip bg-amber"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                <span class="trend">↑ 1.8%</span>
+              </div>
+              <div class="lbl">Attendance Rate</div>
+              <div class="val">91.4%</div>
+            </div>
+            <div class="stat">
+              <div class="top">
+                <div class="iconchip bg-purple"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M18 8v6M21 11h-6"/></svg></div>
+                <span class="trend">↑ 3</span>
+              </div>
+              <div class="lbl">Open Registrations</div>
+              <div class="val">6</div>
+            </div>
+            <div class="stat">
+              <div class="top">
+                <div class="iconchip bg-brand"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg></div>
+                <span class="trend">↑ 240</span>
+              </div>
+              <div class="lbl">Certificates Issued</div>
+              <div class="val">2,140</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- B: Program / department distribution -->
+        <section class="card a-dist">
+          <div class="cardhead">
+            <div><h3>Participants by Department</h3></div>
+            <span class="pill"><span class="live"></span>Live</span>
+          </div>
+          <div class="donutwrap">
+            <div class="donut">
+              <svg viewBox="0 0 160 160" width="150" height="150">
+                <g transform="rotate(-90 80 80)" fill="none" stroke-width="18" stroke-linecap="butt">
+                  <circle cx="80" cy="80" r="70" stroke="#eef2f7" stroke-width="18"></circle>
+                  <circle cx="80" cy="80" r="70" stroke="#10b981" stroke-dasharray="159.4 280.4" stroke-dashoffset="0"></circle>
+                  <circle cx="80" cy="80" r="70" stroke="#3b82f6" stroke-dasharray="98.1 341.7" stroke-dashoffset="-159.4"></circle>
+                  <circle cx="80" cy="80" r="70" stroke="#f59e0b" stroke-dasharray="80.4 359.4" stroke-dashoffset="-257.5"></circle>
+                  <circle cx="80" cy="80" r="70" stroke="#8b5cf6" stroke-dasharray="66.1 373.7" stroke-dashoffset="-337.9"></circle>
+                  <circle cx="80" cy="80" r="70" stroke="#ec4899" stroke-dasharray="35.8 404" stroke-dashoffset="-404"></circle>
+                </g>
+              </svg>
+              <div class="center"><div class="v">1,264</div><div class="l">enrolled</div></div>
+            </div>
+            <div class="legend">
+              <div class="row"><span class="dot bg-brand"></span><span class="nm">Engineering</span><span class="ct">458</span></div>
+              <div class="row"><span class="dot bg-blue"></span><span class="nm">Management</span><span class="ct">282</span></div>
+              <div class="row"><span class="dot bg-amber"></span><span class="nm">Sciences</span><span class="ct">231</span></div>
+              <div class="row"><span class="dot bg-purple"></span><span class="nm">Humanities</span><span class="ct">190</span></div>
+              <div class="row"><span class="dot bg-pink"></span><span class="nm">Pharmacy</span><span class="ct">103</span></div>
+            </div>
+          </div>
+          <div class="minirow">
+            <div class="mini"><div class="v">8</div><div class="l">Ongoing</div></div>
+            <div class="mini"><div class="v">4</div><div class="l">Upcoming</div></div>
+            <div class="mini"><div class="v">30</div><div class="l">Completed</div></div>
+          </div>
+        </section>
+
+        <!-- C: Today's attendance + trend -->
+        <section class="card a-att">
+          <div class="cardhead">
+            <div><h3>Today's Attendance</h3><div class="sub">FDP on AI · Day 2 of 5</div></div>
+            <span class="linklike">View logs ›</span>
+          </div>
+          <div class="attgrid">
+            <div class="stat">
+              <div class="top"><div class="iconchip bg-brand"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+              <div class="lbl">Present</div><div class="val">318</div>
+              <div class="sub" style="margin-top:2px">92.4% of enrolled</div>
+            </div>
+            <div class="stat">
+              <div class="top"><div class="iconchip bg-amber"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div></div>
+              <div class="lbl">Late</div><div class="val">12</div>
+              <div class="sub" style="margin-top:2px">after 9:30 AM</div>
+            </div>
+            <div class="stat">
+              <div class="top"><div class="iconchip bg-rose"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M17 8l4 4m0-4l-4 4"/></svg></div></div>
+              <div class="lbl">Absent</div><div class="val">26</div>
+              <div class="sub" style="margin-top:2px">not marked</div>
+            </div>
+            <div class="stat">
+              <div class="top"><div class="iconchip bg-teal"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2s2-.9 2-2V2M5 11v11M18 2c-2 0-3 2-3 5s1 4 3 4 3-1 3-4-1-5-3-5zM18 15v7"/></svg></div></div>
+              <div class="lbl">Food Claimed</div><div class="val">274</div>
+              <div class="sub" style="margin-top:2px">of 296 sent</div>
+            </div>
+          </div>
+          <div class="bars">
+            <div class="cap"><b style="font-size:13.5px">Weekly Attendance Trend</b><span class="sub">avg 84%</span></div>
+            <div class="chart">
+              <div class="bar"><div class="col" style="height:78%"></div><div class="d">Mon</div></div>
+              <div class="bar"><div class="col" style="height:52%"></div><div class="d">Tue</div></div>
+              <div class="bar"><div class="col" style="height:92%"></div><div class="d">Wed</div></div>
+              <div class="bar amber"><div class="col" style="height:81%"></div><div class="d">Thu</div></div>
+              <div class="bar"><div class="col" style="height:46%"></div><div class="d">Fri</div></div>
+              <div class="bar"><div class="col" style="height:63%"></div><div class="d">Sat</div></div>
+              <div class="bar"><div class="col" style="height:88%"></div><div class="d">Sun</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- E: Dark session card -->
+        <section class="card dark a-dark">
+          <svg class="wave" viewBox="0 0 400 90" preserveAspectRatio="none" height="80" width="100%"><path d="M0 60 Q 60 20 120 50 T 240 45 T 400 35 L400 90 L0 90 Z" fill="#10b981" opacity="0.18"/><path d="M0 70 Q 70 40 140 62 T 280 58 T 400 52 L400 90 L0 90 Z" fill="#14b8a6" opacity="0.14"/></svg>
+          <div class="lbl">Academic Session 2026–27</div>
+          <div class="big">2,140 certificates</div>
+          <div class="meta">42 programs · 3,482 participants · 91.4% avg attendance</div>
+          <a class="btn" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>Download session report</a>
+        </section>
+
+        <!-- D: Green food action -->
+        <section class="card food a-food">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><path d="M4 15h7v5H4zM15 4h5v5h-5zM15 15h2v2h-2M20 15v5h-5M17 20h3"/></svg></div>
+          <h3>Food QR</h3>
+          <p><b style="color:#fff">128</b> newly eligible participants to notify for today's lunch.</p>
+          <a class="btn" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>Send to newly eligible</a>
+        </section>
+
+        <!-- F: Participant funnel -->
+        <section class="card a-funnel">
+          <div class="cardhead">
+            <div><h3>Participant Funnel</h3><div class="sub">Session-wide, all programs</div></div>
+            <span class="linklike">View report ›</span>
+          </div>
+          <div class="funnel">
+            <div class="step">
+              <div class="ic bg-brand"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M18 8v6M21 11h-6"/></svg></div>
+              <div class="l">Registered</div><div class="v">3,482</div>
+              <div class="track"><i class="bg-brand" style="width:100%"></i></div>
+              <div class="pct">100%</div>
+            </div>
+            <div class="step">
+              <div class="ic bg-blue"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+              <div class="l">Attended</div><div class="v">3,180</div>
+              <div class="track"><i class="bg-blue" style="width:91%"></i></div>
+              <div class="pct">91.3%</div>
+            </div>
+            <div class="step">
+              <div class="ic bg-amber"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+              <div class="l">Food Eligible</div><div class="v">2,940</div>
+              <div class="track"><i class="bg-amber" style="width:84%"></i></div>
+              <div class="pct">84.4%</div>
+            </div>
+            <div class="step">
+              <div class="ic bg-teal"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2s2-.9 2-2V2M5 11v11M18 2c-2 0-3 2-3 5s1 4 3 4 3-1 3-4-1-5-3-5zM18 15v7"/></svg></div>
+              <div class="l">Food Claimed</div><div class="v">2,610</div>
+              <div class="track"><i class="bg-teal" style="width:75%"></i></div>
+              <div class="pct">74.9%</div>
+            </div>
+            <div class="step">
+              <div class="ic bg-purple"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"/></svg></div>
+              <div class="l">Certified</div><div class="v">2,140</div>
+              <div class="track"><i class="bg-purple" style="width:61%"></i></div>
+              <div class="pct">61.5%</div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="foot">IQAC Program Management System · Dashboard preview (static mock data) · theme adapted from “Dreams ERP”.</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
