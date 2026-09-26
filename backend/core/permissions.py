@@ -25,7 +25,11 @@ class IsProgramCoordinatorOrAbove(permissions.BasePermission):
 
 class HasProgramScope(permissions.BasePermission):
     """
-    Check if user has access to the program in the view
+    Check if user has access to the program in the view.
+
+    Fail-closed by default. Views that intentionally allow access without a
+    program context (e.g. list endpoints filtered by the caller's assignments)
+    must set `allow_without_program_scope = True` on the view class.
     """
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -38,11 +42,13 @@ class HasProgramScope(permissions.BasePermission):
         # Get program from view kwargs
         program_id = view.kwargs.get('program_id') or view.kwargs.get('pk')
         if not program_id:
-            return True  # Let object-level permission handle it
+            # Fail-closed: require explicit opt-in on the view
+            return getattr(view, 'allow_without_program_scope', False)
         
         user_programs = request.user.get_program_scopes()
+        # user_programs is None only for system admin / program admin (handled above)
         if user_programs is None:
-            return True
+            return False
         
         return str(program_id) in [str(p) for p in user_programs]
     
@@ -56,11 +62,12 @@ class HasProgramScope(permissions.BasePermission):
             program = obj.program
         
         if program is None:
-            return True
+            # Fail-closed: require explicit opt-in on the view
+            return getattr(view, 'allow_without_program_scope', False)
         
         user_programs = request.user.get_program_scopes()
         if user_programs is None:
-            return True
+            return False
         
         return str(program.id) in [str(p) for p in user_programs]
 

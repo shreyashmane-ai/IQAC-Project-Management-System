@@ -58,19 +58,11 @@ class HasProgramScopePermissionTests(TestCase):
         assign(coordinator, assigned)
         self.assertFalse(_permission(coordinator, program_id=other.id))
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="fail-open: allow when no program_id is present in view kwargs",
-    )
     def test_coordinator_no_program_id_should_deny(self):
         coordinator = make_user(role=Role.PROGRAM_COORDINATOR)
         make_program()
         self.assertFalse(_permission(coordinator))
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="fail-open: allow when obj has no program relation",
-    )
     def test_object_without_program_should_deny(self):
         coordinator = make_user(role=Role.PROGRAM_COORDINATOR)
         self.assertFalse(_permission(coordinator, obj=SimpleNamespace()))
